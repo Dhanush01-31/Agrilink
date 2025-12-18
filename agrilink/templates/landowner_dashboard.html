@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+:root{
+    --green:#2ecc71;
+    --dark:#27ae60;
+    --bg:#f8f9fa;
+}
+.page{
+    background:var(--bg);
+    min-height:90vh;
+    padding:30px 0;
+}
+.card-box{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+    margin-bottom:20px;
+}
+.badge{
+    font-size:12px;
+}
+.btn-green{
+    background:var(--green);
+    color:#fff;
+    border:none;
+}
+.btn-green:hover{
+    background:var(--dark);
+}
+</style>
+
+<div class="page">
+<div class="container">
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-success">Landowner Dashboard</h3>
+        <p class="text-muted mb-0">Manage lands & farmer requests</p>
+    </div>
+    <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#addLandModal">
+        + Add Land
+    </button>
+</div>
+
+<!-- ================= FARMER REQUESTS ================= -->
+<h5 class="mb-3">Farmer Requests</h5>
+
+{% if requests %}
+<div class="row">
+{% for r in requests %}
+<div class="col-md-6 col-lg-4">
+    <div class="card-box">
+        <h6>{{ r.land.farm_name }}</h6>
+
+        <span class="badge 
+        {% if r.status == 'approved' %}bg-success
+        {% elif r.status == 'rejected' %}bg-danger
+        {% else %}bg-warning text-dark{% endif %}">
+        {{ r.status }}
+        </span>
+
+        <p class="mt-2 small">{{ r.message }}</p>
+
+        {% if r.farmer.farmer_details %}
+        <div class="bg-light p-2 rounded">
+            <strong>{{ r.farmer.farmer_details.farmer_name }}</strong><br>
+            {{ r.farmer.farmer_details.field_experience }}<br>
+            {{ r.farmer.farmer_details.experience_years }} years
+        </div>
+        {% endif %}
+
+        {% if r.status == 'pending' %}
+        <form method="POST" action="{% url 'landowner_dashboard' %}" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="request_id" value="{{ r.id }}">
+            <button name="approve_request" class="btn btn-sm btn-success">Approve</button>
+            <button name="reject_request" class="btn btn-sm btn-danger">Reject</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No farmer requests yet.</p>
+{% endif %}
+
+<hr class="my-4">
+
+<!-- ================= MY LANDS ================= -->
+<h5 class="mb-3">My Lands</h5>
+
+{% if lands %}
+<div class="row">
+{% for land in lands %}
+<div class="col-md-6 col-lg-4">
+    <div class="card-box">
+        <h6>{{ land.farm_name }}</h6>
+
+        <span class="badge bg-info">{{ land.get_soil_type_display }}</span>
+        <span class="badge bg-secondary">{{ land.get_suitable_for_display }}</span>
+
+        <p class="mt-2 small">
+            📍 {{ land.location }}
+        </p>
+
+        <p class="small">{{ land.description|truncatechars:100 }}</p>
+
+        <small class="text-muted">
+            📞 {{ land.phone }}
+        </small>
+
+        {% if land.images.all %}
+        <div class="mt-2">
+            {% for img in land.images.all|slice:":1" %}
+                <img src="{{ img.image.url }}" class="img-fluid rounded">
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No lands added yet.</p>
+{% endif %}
+
+</div>
+</div>
+
+<!-- ================= ADD LAND MODAL ================= -->
+<div class="modal fade" id="addLandModal">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+
+<div class="modal-header bg-success text-white">
+    <h5>Add Land</h5>
+    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<form method="POST"
+      action="{% url 'landowner_dashboard' %}"
+      enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<div class="mb-3">
+    <label>Farm Name</label>
+    <input type="text" name="farm_name" class="form-control" required>
+</div>
+
+<div class="row">
+<div class="col-md-6 mb-3">
+    <label>Soil Type</label>
+    <select name="soil_type" class="form-control" required>
+        <option value="">Select</option>
+        <option value="black">Black</option>
+        <option value="red">Red</option>
+        <option value="alluvial">Alluvial</option>
+        <option value="sandy">Sandy</option>
+    </select>
+</div>
+
+<div class="col-md-6 mb-3">
+    <label>Suitable For</label>
+    <select name="suitable_for" class="form-control" required>
+        <option value="">Select</option>
+        <option value="vegetables">Vegetables</option>
+        <option value="fruits">Fruits</option>
+        <option value="both">Both</option>
+    </select>
+</div>
+</div>
+
+<div class="mb-3">
+    <label>Location</label>
+    <input type="text" name="location" class="form-control" required>
+</div>
+
+<div class="mb-3">
+    <label>Description</label>
+    <textarea name="description" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+    <label>Land Photos</label>
+    <input type="file" name="images" class="form-control" multiple required>
+</div>
+
+<button name="add_land" class="btn btn-green w-100">
+    Save Land
+</button>
+
+</form>
+</div>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

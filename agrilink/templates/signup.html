@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - AgriLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --light-green: #d5f4e6;
+            --dark-green: #27ae60;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --text-dark: #333333;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .signup-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .signup-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--light-green);
+        }
+        
+        .signup-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: var(--white);
+            padding: 35px 30px;
+            text-align: center;
+        }
+        
+        .signup-header h2 {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .signup-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        .signup-body {
+            padding: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-green);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25);
+        }
+        
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+        
+        .user-type-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        
+        .user-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .user-type-btn:hover {
+            border-color: var(--primary-green);
+            background-color: var(--light-green);
+        }
+        
+        .user-type-btn.active {
+            border-color: var(--primary-green);
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .user-type-btn i {
+            font-size: 2rem;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+        
+        .user-type-btn span {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .signup-btn {
+            background-color: var(--primary-green);
+            border: none;
+            color: var(--white);
+            padding: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .signup-btn:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #6c757d;
+        }
+        
+        .login-link a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-icon {
+            position: relative;
+        }
+        
+        .input-icon .form-control {
+            padding-left: 45px;
+        }
+        
+        .input-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-green);
+            font-size: 18px;
+        }
+        
+        .agrilink-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .agrilink-logo h1 {
+            color: var(--primary-green);
+            font-weight: 800;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .agrilink-logo span {
+            color: var(--dark-green);
+        }
+        
+        @media (max-width: 576px) {
+            .signup-body {
+                padding: 30px 25px;
+            }
+            
+            .signup-header {
+                padding: 25px 20px;
+            }
+            
+            .user-type-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="agrilink-logo">
+            <h1>Agri<span>Link</span></h1>
+        </div>
+        
+        <div class="signup-card">
+            <div class="signup-header">
+                <h2>Create Your Account</h2>
+                <p>Join AgriLink to connect with farmers or landowners</p>
+            </div>
+            
+            <div class="signup-body">
+                {% if messages %}
+                <div class="alert alert-danger mb-4" role="alert">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <form method="POST" id="signupForm">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="name" class="form-label">Full Name</label>
+                        <div class="input-icon">
+                            <i class="bi bi-person"></i>
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="error-message" id="nameError">Please enter your full name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <div class="input-icon">
+                            <i class="bi bi-telephone"></i>
+                            <input type="tel" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-icon">
+                            <i class="bi bi-envelope"></i>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                        </div>
+                        <div class="error-message" id="emailError">Please enter a valid email address</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-icon">
+                            <i class="bi bi-lock"></i>
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Create a password" required>
+                        </div>
+                        <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user_type" class="form-label">I want to join as:</label>
+                        <input type="hidden" name="user_type" id="user_type" value="" required>
+                        <div class="user-type-options">
+                            <div class="user-type-btn" id="farmerBtn" onclick="selectUserType('farmer')">
+                                <i class="bi bi-person-badge"></i>
+                                <span>Farmer</span>
+                                <p class="small mt-2 mb-0" style="color: #6c757d;">Looking for land to cultivate</p>
+                            </div>
+                            <div class="user-type-btn" id="landownerBtn" onclick="selectUserType('landowner')">
+                                <i class="bi bi-house-door"></i>
+                                <span>Landowner</span>
+                                <p class="small mt-2 mb-0" style="color: #6c757d;">Have land to lease/share</p>
+                            </div>
+                        </div>
+                        <div class="error-message" id="userTypeError">Please select a user type</div>
+                    </div>
+                    
+                    <button type="submit" class="signup-btn" id="submitBtn">
+                        Create Account
+                    </button>
+                    
+                    <div class="login-link">
+                        <p>Already have an account? <a href="/login/">Login here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4" style="color: #6c757d; font-size: 14px;">
+            <p>By creating an account, you agree to our <a href="#" style="color: var(--primary-green);">Terms of Service</a> and <a href="#" style="color: var(--primary-green);">Privacy Policy</a></p>
+        </div>
+    </div>
+    
+    <script>
+        // User type selection
+        function selectUserType(type) {
+            document.getElementById('user_type').value = type;
+            
+            // Reset all buttons
+            document.getElementById('farmerBtn').classList.remove('active');
+            document.getElementById('landownerBtn').classList.remove('active');
+            
+            // Activate selected button
+            document.getElementById(type + 'Btn').classList.add('active');
+            
+            // Clear error
+            document.getElementById('userTypeError').style.display = 'none';
+        }
+        
+        // Form validation
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Check name
+            const name = document.getElementById('name').value.trim();
+            if (name.length < 2) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+            }
+            
+            // Check phone
+            const phone = document.getElementById('phone').value.trim();
+            const phoneRegex = /^[0-9]{10,15}$/;
+            if (!phoneRegex.test(phone)) {
+                document.getElementById('phoneError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('phoneError').style.display = 'none';
+            }
+            
+            // Check email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+            }
+            
+            // Check password
+            const password = document.getElementById('password').value;
+            if (password.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+            }
+            
+            // Check user type
+            const userType = document.getElementById('user_type').value;
+            if (!userType) {
+                document.getElementById('userTypeError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('userTypeError').style.display = 'none';
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state on button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating Account...';
+            submitBtn.disabled = true;
+        });
+        
+        // Real-time validation
+        document.getElementById('name').addEventListener('input', function() {
+            if (this.value.trim().length >= 2) {
+                document.getElementById('nameError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('phone').addEventListener('input', function() {
+            const phoneRegex = /^[0-9]{10,15}$/;
+            if (phoneRegex.test(this.value.trim())) {
+                document.getElementById('phoneError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('email').addEventListener('input', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(this.value.trim())) {
+                document.getElementById('emailError').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('password').addEventListener('input', function() {
+            if (this.value.length >= 6) {
+                document.getElementById('passwordError').style.display = 'none';
+            }
+        });
+        
+        // Initialize form with a selected user type if coming from a link
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            if (type === 'farmer' || type === 'landowner') {
+                selectUserType(type);
+            }
+        });
+    </script>
+</body>
+</html>

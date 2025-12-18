@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="text-success fw-bold">Farmer Dashboard</h3>
+            <p class="text-muted mb-0">View lands and manage your requests</p>
+        </div>
+        <div>
+            <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#farmerModal">
+                Farmer Details
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h4>{{ pending_count }}</h4>
+                <small class="text-muted">Pending</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h4>{{ approved_count }}</h4>
+                <small class="text-muted">Approved</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center p-3">
+                <h4>{{ cancelled_count }}</h4>
+                <small class="text-muted">Cancelled</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- AVAILABLE LANDS -->
+    <h5 class="fw-bold mb-3 text-success">Available Lands</h5>
+
+    <div class="row">
+        {% if lands %}
+            {% for land in lands %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+
+                    {% if land.images.first %}
+                    <img src="{{ land.images.first.image.url }}"
+                         class="card-img-top"
+                         style="height:200px;object-fit:cover;">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ land.farm_name }}</h5>
+
+                        <p class="mb-1"><strong>Soil:</strong> {{ land.get_soil_type_display }}</p>
+                        <p class="mb-1"><strong>Suitable:</strong> {{ land.get_suitable_for_display }}</p>
+                        <p class="mb-1"><strong>Location:</strong> {{ land.location }}</p>
+
+                        <p class="text-muted small">
+                            {{ land.description|truncatechars:80 }}
+                        </p>
+
+                        <button class="btn btn-success w-100"
+                                data-bs-toggle="modal"
+                                data-bs-target="#requestModal"
+                                onclick="setLand('{{ land.id }}')">
+                            Send Request
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center">No lands available</p>
+        {% endif %}
+    </div>
+
+    <!-- MY REQUESTS -->
+    <h5 class="fw-bold mt-5 mb-3 text-success">My Requests</h5>
+
+    <div class="row">
+        {% if requests %}
+            {% for r in requests %}
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6>{{ r.land_title }}</h6>
+                        <p class="small text-muted">{{ r.message }}</p>
+
+                        <span class="badge bg-secondary">{{ r.status|title }}</span>
+
+                        {% if r.status == 'pending' %}
+                        <a href="{% url 'cancel_request' r.pk %}"
+                           class="btn btn-sm btn-danger float-end"
+                           onclick="return confirm('Cancel this request?');">
+                            Cancel
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted text-center">No requests sent yet</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- FARMER DETAILS MODAL -->
+<div class="modal fade" id="farmerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Farmer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="save_farmer" class="btn btn-success">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SEND REQUEST MODAL -->
+<div class="modal fade" id="requestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="land_id" id="land_id">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Send Land Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    {{ req_form.as_p }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="send_request" class="btn btn-success">
+                        Send Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function setLand(id) {
+    document.getElementById('land_id').value = id;
+}
+</script>
+
+{% endblock %}
