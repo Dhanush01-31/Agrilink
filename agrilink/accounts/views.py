@@ -4,8 +4,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .forms import SignupForm, FarmerDetailsForm, LandRequestForm,LandForm
-from .models import Profile, FarmerDetails, LandRequest,Land,LandImage
+from .forms import SignupForm, FarmerDetailsForm, LandRequestForm,LandForm,ProductForm,ProductRequestForm
+from .models import Profile, FarmerDetails, LandRequest,Land,LandImage,Product,ProductRequest,ProductImage
 
 
 def home(request):
@@ -52,9 +52,13 @@ def login_view(request):
 @login_required
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
+
     if profile.user_type == 'farmer':
         return redirect('farmer_dashboard')
-    return redirect('landowner_dashboard')
+    elif profile.user_type == 'landowner':
+        return redirect('landowner_dashboard')
+    else:
+        return redirect('customer_dashboard')
 
 
 def logout_view(request):
@@ -71,19 +75,20 @@ def farmer_dashboard(request):
 
     farmer = FarmerDetails.objects.filter(user=request.user).first()
 
-    # 🔹 FETCH ALL LANDS ADDED BY LANDOWNERS
     lands = Land.objects.all().prefetch_related('images')
-
-    # 🔹 FETCH FARMER REQUESTS
     requests = LandRequest.objects.filter(farmer=request.user)
 
-    # 🔹 COUNTS FOR STATS
+    products = Product.objects.filter(farmer=request.user)
+
     pending_count = requests.filter(status='pending').count()
     approved_count = requests.filter(status='approved').count()
     cancelled_count = requests.filter(status='cancelled').count()
 
+    product_form = ProductForm()
+
     if request.method == 'POST':
-        # Save farmer details
+
+        # SAVE FARMER PROFILE
         if 'save_farmer' in request.POST:
             form = FarmerDetailsForm(request.POST, instance=farmer)
             if form.is_valid():
@@ -92,11 +97,28 @@ def farmer_dashboard(request):
                 obj.save()
                 return redirect('farmer_dashboard')
 
-        # Send land request
+        # ADD PRODUCT
+        if 'add_product' in request.POST:
+            product_form = ProductForm(request.POST)
+            if product_form.is_valid():
+                product = product_form.save(commit=False)
+                product.farmer = request.user
+                product.save()
+
+                # Save multiple images
+                for img in request.FILES.getlist('images'):
+                    ProductImage.objects.create(
+                        product=product,
+                        image=img
+                    )
+
+                messages.success(request, "Product added successfully")
+                return redirect('farmer_dashboard')
+
+        # SEND LAND REQUEST
         if 'send_request' in request.POST:
             land_id = request.POST.get('land_id')
             land = get_object_or_404(Land, id=land_id)
-
             req_form = LandRequestForm(request.POST)
             if req_form.is_valid():
                 req = req_form.save(commit=False)
@@ -111,13 +133,14 @@ def farmer_dashboard(request):
     return render(request, 'farmer_dashboard.html', {
         'form': form,
         'req_form': req_form,
-        'lands': lands,   # ✅ VERY IMPORTANT
+        'lands': lands,
         'requests': requests,
+        'products': products,
+        'product_form': product_form,
         'pending_count': pending_count,
         'approved_count': approved_count,
         'cancelled_count': cancelled_count,
     })
-
 
 @login_required
 def delete_farmer_details(request, pk):
@@ -152,7 +175,7 @@ def landowner_dashboard(request):
 
     if request.method == 'POST':
 
-        # ✅ ADD LAND
+        #  ADD LAND
         if 'add_land' in request.POST:
             land_form = LandForm(request.POST)
             if land_form.is_valid():
@@ -168,7 +191,7 @@ def landowner_dashboard(request):
                 messages.success(request, "Land added successfully")
                 return redirect('landowner_dashboard')
 
-        # ✅ APPROVE / REJECT REQUEST
+        #  APPROVE / REJECT REQUEST
         if 'request_id' in request.POST:
             req = get_object_or_404(
                 LandRequest,
@@ -190,4 +213,48 @@ def landowner_dashboard(request):
         'land_form': land_form,
     })
 
+# delete land
+@login_required
+def delete_land(request, pk):
+    profile = get_object_or_404(Profile, user=request.user)
+
+    # Only landowners allowed
+    if profile.user_type != 'landowner':
+        return redirect('dashboard')
+
+    land = get_object_or_404(Land, pk=pk, owner=request.user)
+
+    land.delete()
+    messages.success(request, "Land deleted successfully")
+
+    return redirect('landowner_dashboard')
+
+# Customer dasboard
+@login_required
+def customer_dashboard(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    if profile.user_type != 'customer':
+        return redirect('dashboard')
+
+    products = Product.objects.all()
+    requests = ProductRequest.objects.filter(customer=request.user)
+    req_form = ProductRequestForm()
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+
+        req_form = ProductRequestForm(request.POST)
+        if req_form.is_valid():
+            req = req_form.save(commit=False)
+            req.customer = request.user
+            req.product = product
+            req.save()
+            return redirect('customer_dashboard')
+
+    return render(request, 'customer_dashboard.html', {
+        'products': products,
+        'requests': requests,
+        'req_form': req_form,
+    })
 

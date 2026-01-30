@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+:root{
+    --green:#2ecc71;
+    --dark:#27ae60;
+    --bg:#f8f9fa;
+}
+.page{
+    background:var(--bg);
+    min-height:90vh;
+    padding:30px 0;
+}
+.card-box{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+    margin-bottom:20px;
+}
+.badge{
+    font-size:12px;
+}
+.btn-green{
+    background:var(--green);
+    color:#fff;
+    border:none;
+}
+.btn-green:hover{
+    background:var(--dark);
+}
+</style>
+
+<div class="page">
+<div class="container">
+
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-success">Customer Dashboard</h3>
+        <p class="text-muted mb-0">Browse farmer products & send requests</p>
+    </div>
+</div>
+
+<!-- AVAILABLE PRODUCTS -->
+<h5 class="mb-3">Available Products</h5>
+
+{% if products %}
+<div class="row">
+{% for p in products %}
+<div class="col-md-6 col-lg-4">
+    <div class="card-box">
+        <h6 class="fw-bold">{{ p.name }}</h6>
+
+        <span class="badge bg-info">{{ p.category }}</span>
+        <span class="badge bg-success">₹ {{ p.price }}</span>
+
+        <p class="small mt-2">
+            Quantity Available: <strong>{{ p.quantity }}</strong>
+        </p>
+
+        <p class="small text-muted">
+            {{ p.description|truncatechars:120 }}
+        </p>
+
+        <p class="small">
+            <strong>Farmer:</strong> {{ p.farmer.first_name }} <br>
+            <strong>Phone:</strong> {{ p.farmer.profile.phone }}
+        </p>
+
+        <!-- SEND REQUEST -->
+        <form method="POST" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+
+            <div class="mb-2">
+                <input type="number"
+                       name="quantity"
+                       class="form-control"
+                       placeholder="Required Quantity"
+                       min="1"
+                       required>
+            </div>
+
+            <div class="mb-2">
+                <textarea name="message"
+                          class="form-control"
+                          rows="2"
+                          placeholder="Message (optional)"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-green w-100">
+                Send Request
+            </button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">No products available right now.</p>
+{% endif %}
+
+<hr class="my-4">
+
+<!-- MY PRODUCT REQUESTS -->
+<h5 class="mb-3">My Requests</h5>
+
+{% if requests %}
+<div class="row">
+{% for r in requests %}
+<div class="col-md-6 col-lg-4">
+    <div class="card-box">
+        <h6>{{ r.product.name }}</h6>
+
+        <span class="badge 
+            {% if r.status == 'pending' %}bg-warning
+            {% elif r.status == 'approved' %}bg-success
+            {% elif r.status == 'rejected' %}bg-danger
+            {% else %}bg-secondary{% endif %}
+        ">
+            {{ r.status|title }}
+        </span>
+
+        <p class="small mt-2">
+            Requested Qty: {{ r.quantity }}
+        </p>
+
+        <p class="small text-muted">
+            {{ r.message|default:"No message" }}
+        </p>
+
+        <p class="small">
+            Farmer: {{ r.product.farmer.first_name }} <br>
+            Phone: {{ r.product.farmer.profile.phone }}
+        </p>
+
+        <small class="text-muted">
+            {{ r.created_at|date:"d M Y" }}
+        </small>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<p class="text-muted">You have not sent any requests yet.</p>
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}

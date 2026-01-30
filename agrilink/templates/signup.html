@@ -91,7 +91,7 @@
         
         .user-type-options {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-top: 5px;
         }
@@ -174,11 +174,11 @@
             display: none;
         }
         
-        .success-message {
-            color: #28a745;
+        .field-error {
+            color: #dc3545;
             font-size: 14px;
             margin-top: 5px;
-            display: none;
+            display: block;
         }
         
         .input-icon {
@@ -214,6 +214,16 @@
             color: var(--dark-green);
         }
         
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .user-type-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 576px) {
             .signup-body {
                 padding: 30px 25px;
@@ -221,10 +231,6 @@
             
             .signup-header {
                 padding: 25px 20px;
-            }
-            
-            .user-type-options {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -238,7 +244,7 @@
         <div class="signup-card">
             <div class="signup-header">
                 <h2>Create Your Account</h2>
-                <p>Join AgriLink to connect with farmers or landowners</p>
+                <p>Join AgriLink to connect with farmers, landowners, or customers</p>
             </div>
             
             <div class="signup-body">
@@ -250,60 +256,125 @@
                 </div>
                 {% endif %}
                 
-                <form method="POST" id="signupForm">
+                <form method="POST" id="signupForm" novalidate>
                     {% csrf_token %}
                     
+                    <!-- Display form errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger mb-4" role="alert">
+                        Please correct the errors below.
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Full Name Field -->
                     <div class="form-group">
                         <label for="name" class="form-label">Full Name</label>
                         <div class="input-icon">
                             <i class="bi bi-person"></i>
-                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" required>
+                            <input type="text" name="name" id="name" class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+                                   placeholder="Enter your full name" 
+                                   value="{% if form.name.value %}{{ form.name.value }}{% endif %}" required>
                         </div>
+                        {% if form.name.errors %}
+                        <div class="field-error">
+                            {% for error in form.name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="error-message" id="nameError">Please enter your full name</div>
                     </div>
                     
+                    <!-- Phone Number Field -->
                     <div class="form-group">
                         <label for="phone" class="form-label">Phone Number</label>
                         <div class="input-icon">
                             <i class="bi bi-telephone"></i>
-                            <input type="tel" name="phone" id="phone" class="form-control" placeholder="Enter your phone number" required>
+                            <input type="tel" name="phone" id="phone" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" 
+                                   placeholder="Enter your phone number" 
+                                   value="{% if form.phone.value %}{{ form.phone.value }}{% endif %}" required>
                         </div>
+                        {% if form.phone.errors %}
+                        <div class="field-error">
+                            {% for error in form.phone.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="error-message" id="phoneError">Please enter a valid phone number</div>
                     </div>
                     
+                    <!-- Email Field -->
                     <div class="form-group">
                         <label for="email" class="form-label">Email Address</label>
                         <div class="input-icon">
                             <i class="bi bi-envelope"></i>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                            <input type="email" name="email" id="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                   placeholder="Enter your email address" 
+                                   value="{% if form.email.value %}{{ form.email.value }}{% endif %}" required>
                         </div>
+                        {% if form.email.errors %}
+                        <div class="field-error">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="error-message" id="emailError">Please enter a valid email address</div>
                     </div>
                     
+                    <!-- Password Field -->
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
                         <div class="input-icon">
                             <i class="bi bi-lock"></i>
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Create a password" required>
+                            <input type="password" name="password" id="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                   placeholder="Create a password (minimum 6 characters)" required>
                         </div>
+                        {% if form.password.errors %}
+                        <div class="field-error">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
                     </div>
                     
+                    <!-- User Type Field -->
                     <div class="form-group">
                         <label for="user_type" class="form-label">I want to join as:</label>
-                        <input type="hidden" name="user_type" id="user_type" value="" required>
+                        <input type="hidden" name="user_type" id="user_type" 
+                               value="{% if form.user_type.value %}{{ form.user_type.value }}{% endif %}" required>
                         <div class="user-type-options">
+                            <!-- Farmer Option -->
                             <div class="user-type-btn" id="farmerBtn" onclick="selectUserType('farmer')">
                                 <i class="bi bi-person-badge"></i>
                                 <span>Farmer</span>
                                 <p class="small mt-2 mb-0" style="color: #6c757d;">Looking for land to cultivate</p>
                             </div>
+                            
+                            <!-- Landowner Option -->
                             <div class="user-type-btn" id="landownerBtn" onclick="selectUserType('landowner')">
                                 <i class="bi bi-house-door"></i>
                                 <span>Landowner</span>
                                 <p class="small mt-2 mb-0" style="color: #6c757d;">Have land to lease/share</p>
                             </div>
+                            
+                            <!-- Customer Option -->
+                            <div class="user-type-btn" id="customerBtn" onclick="selectUserType('customer')">
+                                <i class="bi bi-cart"></i>
+                                <span>Customer</span>
+                                <p class="small mt-2 mb-0" style="color: #6c757d;">Looking to buy fresh produce</p>
+                            </div>
                         </div>
+                        {% if form.user_type.errors %}
+                        <div class="field-error">
+                            {% for error in form.user_type.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="error-message" id="userTypeError">Please select a user type</div>
                     </div>
                     
@@ -312,7 +383,7 @@
                     </button>
                     
                     <div class="login-link">
-                        <p>Already have an account? <a href="/login/">Login here</a></p>
+                        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
                     </div>
                 </form>
             </div>
@@ -331,6 +402,7 @@
             // Reset all buttons
             document.getElementById('farmerBtn').classList.remove('active');
             document.getElementById('landownerBtn').classList.remove('active');
+            document.getElementById('customerBtn').classList.remove('active');
             
             // Activate selected button
             document.getElementById(type + 'Btn').classList.add('active');
@@ -347,9 +419,11 @@
             const name = document.getElementById('name').value.trim();
             if (name.length < 2) {
                 document.getElementById('nameError').style.display = 'block';
+                document.getElementById('name').classList.add('is-invalid');
                 isValid = false;
             } else {
                 document.getElementById('nameError').style.display = 'none';
+                document.getElementById('name').classList.remove('is-invalid');
             }
             
             // Check phone
@@ -357,9 +431,11 @@
             const phoneRegex = /^[0-9]{10,15}$/;
             if (!phoneRegex.test(phone)) {
                 document.getElementById('phoneError').style.display = 'block';
+                document.getElementById('phone').classList.add('is-invalid');
                 isValid = false;
             } else {
                 document.getElementById('phoneError').style.display = 'none';
+                document.getElementById('phone').classList.remove('is-invalid');
             }
             
             // Check email
@@ -367,18 +443,22 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 document.getElementById('emailError').style.display = 'block';
+                document.getElementById('email').classList.add('is-invalid');
                 isValid = false;
             } else {
                 document.getElementById('emailError').style.display = 'none';
+                document.getElementById('email').classList.remove('is-invalid');
             }
             
             // Check password
             const password = document.getElementById('password').value;
             if (password.length < 6) {
                 document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('password').classList.add('is-invalid');
                 isValid = false;
             } else {
                 document.getElementById('passwordError').style.display = 'none';
+                document.getElementById('password').classList.remove('is-invalid');
             }
             
             // Check user type
@@ -405,6 +485,7 @@
         document.getElementById('name').addEventListener('input', function() {
             if (this.value.trim().length >= 2) {
                 document.getElementById('nameError').style.display = 'none';
+                this.classList.remove('is-invalid');
             }
         });
         
@@ -412,6 +493,7 @@
             const phoneRegex = /^[0-9]{10,15}$/;
             if (phoneRegex.test(this.value.trim())) {
                 document.getElementById('phoneError').style.display = 'none';
+                this.classList.remove('is-invalid');
             }
         });
         
@@ -419,21 +501,30 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (emailRegex.test(this.value.trim())) {
                 document.getElementById('emailError').style.display = 'none';
+                this.classList.remove('is-invalid');
             }
         });
         
         document.getElementById('password').addEventListener('input', function() {
             if (this.value.length >= 6) {
                 document.getElementById('passwordError').style.display = 'none';
+                this.classList.remove('is-invalid');
             }
         });
         
-        // Initialize form with a selected user type if coming from a link
+        // Initialize form on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Select user type from URL parameter
             const urlParams = new URLSearchParams(window.location.search);
             const type = urlParams.get('type');
-            if (type === 'farmer' || type === 'landowner') {
+            if (type && ['farmer', 'landowner', 'customer'].includes(type)) {
                 selectUserType(type);
+            }
+            
+            // Select user type from form value (on validation error)
+            const userTypeValue = document.getElementById('user_type').value;
+            if (userTypeValue) {
+                selectUserType(userTypeValue);
             }
         });
     </script>

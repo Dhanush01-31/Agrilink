@@ -1,5 +1,6 @@
+# accounts/forms.py
 from django import forms
-from .models import FarmerDetails, LandRequest,Land
+from .models import FarmerDetails, LandRequest, Land,Product,ProductRequest
 
 
 class SignupForm(forms.Form):
@@ -8,8 +9,13 @@ class SignupForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     user_type = forms.ChoiceField(
-        choices=[('farmer', 'Farmer'), ('landowner', 'Landowner')]
+        choices=[
+            ('farmer', 'Farmer'),
+            ('landowner', 'Landowner'),
+            ('customer', 'Customer'), 
+        ]
     )
+
 
 
 class FarmerDetailsForm(forms.ModelForm):
@@ -23,21 +29,14 @@ class FarmerDetailsForm(forms.ModelForm):
             'field_experience',
             'description',
         ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }
 
 
 class LandRequestForm(forms.ModelForm):
     class Meta:
         model = LandRequest
         fields = ['message']
-        widgets = {
-            'message': forms.Textarea(attrs={'rows': 3}),
-        }
 
 
-# land form
 class LandForm(forms.ModelForm):
     class Meta:
         model = Land
@@ -48,6 +47,17 @@ class LandForm(forms.ModelForm):
             'location',
             'description',
         ]
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'quantity', 'description']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
+
+
+class ProductRequestForm(forms.ModelForm):
+    class Meta:
+        model = ProductRequest
+        fields = ['quantity', 'message']
