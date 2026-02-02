@@ -2,133 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AgriLink - Connecting Farmers & Landowners</title>
-    <link rel="icon" href="data:,">
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FarmLand System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        /* Green and white theme */
-        :root {
-            --primary-green: #2ecc71;
-            --light-green: #d5f4e6;
-            --dark-green: #27ae60;
-            --white: #ffffff;
-            --light-gray: #f8f9fa;
-            --medium-gray: #e9ecef;
-            --text-dark: #333333;
+        .navbar {
+            background-color: #28a745;
         }
-        
-        body {
-            background-color: var(--white);
-            color: var(--text-dark);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .navbar-brand, .nav-link {
+            color: white !important;
         }
-        
-        /* Custom navbar */
-        .navbar-custom {
-            background-color: var(--white) !important;
-            box-shadow: 0 2px 15px rgba(46, 204, 113, 0.1);
-            border-bottom: 3px solid var(--primary-green);
-        }
-        
-        .brand {
-            font-weight: 800;
-            color: var(--primary-green) !important;
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-        }
-        
-        .brand span {
-            color: var(--dark-green);
-        }
-        
-        .nav-link-custom {
-            color: var(--text-dark) !important;
-            margin-left: 12px;
-            font-weight: 500;
-            border-radius: 4px;
-            padding: 8px 16px !important;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-link-custom:hover {
-            background-color: var(--light-green);
-            color: var(--dark-green) !important;
-            transform: translateY(-2px);
-        }
-        
-        .nav-link-custom.active {
-            background-color: var(--primary-green);
-            color: var(--white) !important;
-        }
-        
-        /* Main content area */
-        .main-content {
-            flex: 1;
-        }
-        
-        /* Footer */
-        .footer {
-            background-color: var(--light-green);
-            color: var(--text-dark);
-            padding: 60px 0 30px;
-            margin-top: auto;
-        }
-        
-        .footer-brand {
-            color: var(--dark-green);
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        .footer-link {
-            color: #555;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        
-        .footer-link:hover {
-            color: var(--primary-green);
-        }
-        
-        /* Button styling */
-        .btn-primary-custom {
-            background-color: var(--primary-green);
-            border-color: var(--primary-green);
-            color: var(--white);
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary-custom:hover {
-            background-color: var(--dark-green);
-            border-color: var(--dark-green);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.2);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .nav-link-custom {
-                margin-left: 0;
-                margin-top: 5px;
-            }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand brand" href="/">Agri<span>Link</span></a>
+            <a class="navbar-brand" href="{% url 'home' %}">FarmLand System</a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -137,37 +33,27 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/#farmers">For Farmers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/#landowners">For Landowners</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/#how-it-works">How It Works</a>
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                     
                     {% if user.is_authenticated %}
+                        <!-- Show Dashboard if user is logged in -->
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom {% if '/dashboard/' in request.path %}active{% endif %}" href="/dashboard/">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom" href="/logout/">
-                                <i class="bi bi-box-arrow-right me-1"></i>Logout
-                            </a>
+                            <span class="nav-link">Welcome, {{ user.first_name|default:user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                         </li>
                     {% else %}
+                        <!-- Show Login/Signup if user is not logged in -->
                         <li class="nav-item">
-                            <a class="nav-link nav-link-custom {% if '/login/' in request.path %}active{% endif %}" href="/login/">
-                                <i class="bi bi-box-arrow-in-right me-1"></i>Login
-                            </a>
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary-custom ms-2" href="/signup/">Sign Up Free</a>
+                            <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -175,109 +61,30 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        {% block content %}{% endblock %}
+    <!-- Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h3 class="footer-brand mb-3">Agri<span style="color: var(--primary-green);">Link</span></h3>
-                    <p class="mb-4">Connecting farmers with landowners to cultivate partnerships and grow the agricultural community.</p>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-decoration-none" style="color: var(--dark-green); font-size: 1.2rem;">
-                            <i class="bi bi-facebook"></i>
-                        </a>
-                        <a href="#" class="text-decoration-none" style="color: var(--dark-green); font-size: 1.2rem;">
-                            <i class="bi bi-twitter"></i>
-                        </a>
-                        <a href="#" class="text-decoration-none" style="color: var(--dark-green); font-size: 1.2rem;">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-3" style="color: var(--dark-green);">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/" class="footer-link">Home</a></li>
-                        <li class="mb-2"><a href="/#farmers" class="footer-link">For Farmers</a></li>
-                        <li class="mb-2"><a href="/#landowners" class="footer-link">For Landowners</a></li>
-                        <li class="mb-2"><a href="/#how-it-works" class="footer-link">How It Works</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-3" style="color: var(--dark-green);">Account</h5>
-                    <ul class="list-unstyled">
-                        {% if user.is_authenticated %}
-                            <li class="mb-2"><a href="/dashboard/" class="footer-link">Dashboard</a></li>
-                            <li class="mb-2"><a href="/logout/" class="footer-link">Logout</a></li>
-                        {% else %}
-                            <li class="mb-2"><a href="/login/" class="footer-link">Login</a></li>
-                            <li class="mb-2"><a href="/signup/" class="footer-link">Sign Up</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-4">
-                    <h5 class="mb-3" style="color: var(--dark-green);">Contact Us</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <a href="mailto:info@agrilink.com" class="footer-link">
-                                <i class="bi bi-envelope me-2"></i>info@agrilink.com
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="tel:+11234567890" class="footer-link">
-                                <i class="bi bi-telephone me-2"></i>+1 (123) 456-7890
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-geo-alt me-2"></i>123 Farm Street, Agriculture City
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            
-            <hr class="my-5" style="border-color: rgba(0,0,0,0.1);">
-            
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-0">&copy; 2023 AgriLink. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <a href="#" class="footer-link me-3">Privacy Policy</a>
-                    <a href="#" class="footer-link">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block content %}
+        <!-- Content will be inserted here by child templates -->
+        {% endblock %}
+    </main>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if(targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if(targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    </script>
+    {% block scripts %}
+    <!-- Additional scripts can be added here by child templates -->
+    {% endblock %}
 </body>
 </html>

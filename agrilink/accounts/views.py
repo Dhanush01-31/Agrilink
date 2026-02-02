@@ -4,15 +4,24 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .forms import SignupForm, FarmerDetailsForm, LandRequestForm,LandForm,ProductForm,ProductRequestForm
-from .models import Profile, FarmerDetails, LandRequest,Land,LandImage,Product,ProductRequest,ProductImage
+from .forms import SignupForm, FarmerDetailsForm, LandRequestForm, LandForm, ProductForm, ProductRequestForm
+from .models import Profile, FarmerDetails, LandRequest, Land, LandImage, Product, ProductRequest, ProductImage
+
 
 # Home
 def home(request):
+    # Check if user is already logged in, redirect to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, 'landing.html')
+
 
 # Sign_up 
 def signup_view(request):
+    # If user is already logged in, redirect to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
@@ -36,6 +45,10 @@ def signup_view(request):
 
 # Login
 def login_view(request):
+    # If user is already logged in, redirect to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
     if request.method == 'POST':
         user = authenticate(
             request,
@@ -50,7 +63,7 @@ def login_view(request):
     return render(request, 'login.html')
 
 
-# Dashboard
+# Dashboard - only accessible to logged-in users
 @login_required
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -64,9 +77,11 @@ def dashboard(request):
 
 
 # Logout
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
+
 
 # Farmer dashboard
 @login_required
@@ -145,6 +160,7 @@ def farmer_dashboard(request):
         'cancelled_count': cancelled_count,
     })
 
+
 # Delete Farmer details
 @login_required
 def delete_farmer_details(request, pk):
@@ -156,6 +172,7 @@ def delete_farmer_details(request, pk):
     farmer.delete()
     return redirect('farmer_dashboard')
 
+
 # Cancel_request
 @login_required
 def cancel_request(request, pk):
@@ -165,7 +182,8 @@ def cancel_request(request, pk):
         req.save()
     return redirect('farmer_dashboard')
 
-# land owner dashboard
+
+# Land owner dashboard
 @login_required
 def landowner_dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -179,7 +197,7 @@ def landowner_dashboard(request):
 
     if request.method == 'POST':
 
-        #  ADD LAND
+        # ADD LAND
         if 'add_land' in request.POST:
             land_form = LandForm(request.POST)
             if land_form.is_valid():
@@ -195,7 +213,7 @@ def landowner_dashboard(request):
                 messages.success(request, "Land added successfully")
                 return redirect('landowner_dashboard')
 
-        #  APPROVE / REJECT REQUEST
+        # APPROVE / REJECT REQUEST
         if 'request_id' in request.POST:
             req = get_object_or_404(
                 LandRequest,
@@ -217,7 +235,8 @@ def landowner_dashboard(request):
         'land_form': land_form,
     })
 
-# delete land
+
+# Delete land
 @login_required
 def delete_land(request, pk):
     profile = get_object_or_404(Profile, user=request.user)
@@ -233,7 +252,8 @@ def delete_land(request, pk):
 
     return redirect('landowner_dashboard')
 
-# Customer dasboard
+
+# Customer dashboard
 @login_required
 def customer_dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -261,4 +281,3 @@ def customer_dashboard(request):
         'requests': requests,
         'req_form': req_form,
     })
-
