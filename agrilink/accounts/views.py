@@ -7,11 +7,11 @@ from django.contrib import messages
 from .forms import SignupForm, FarmerDetailsForm, LandRequestForm,LandForm,ProductForm,ProductRequestForm
 from .models import Profile, FarmerDetails, LandRequest,Land,LandImage,Product,ProductRequest,ProductImage
 
-
+# Home
 def home(request):
     return render(request, 'landing.html')
 
-
+# Sign_up 
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -34,6 +34,7 @@ def signup_view(request):
     return render(request, 'signup.html', {'form': form})
 
 
+# Login
 def login_view(request):
     if request.method == 'POST':
         user = authenticate(
@@ -49,6 +50,7 @@ def login_view(request):
     return render(request, 'login.html')
 
 
+# Dashboard
 @login_required
 def dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -61,11 +63,12 @@ def dashboard(request):
         return redirect('customer_dashboard')
 
 
+# Logout
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-
+# Farmer dashboard
 @login_required
 def farmer_dashboard(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -142,6 +145,7 @@ def farmer_dashboard(request):
         'cancelled_count': cancelled_count,
     })
 
+# Delete Farmer details
 @login_required
 def delete_farmer_details(request, pk):
     profile = get_object_or_404(Profile, user=request.user)
@@ -152,7 +156,7 @@ def delete_farmer_details(request, pk):
     farmer.delete()
     return redirect('farmer_dashboard')
 
-
+# Cancel_request
 @login_required
 def cancel_request(request, pk):
     req = get_object_or_404(LandRequest, pk=pk, farmer=request.user)
