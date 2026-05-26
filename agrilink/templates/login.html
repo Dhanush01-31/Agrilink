@@ -2,6 +2,11 @@
 
 {% block content %}
 <style>
+    :root {
+    --primary-green: #2ecc71;
+    --dark-green: #27ae60;
+    --light-green: #d5f5e3;
+}
     .login-section {
         min-height: 70vh;
         display: flex;
@@ -57,12 +62,16 @@
     .login-btn {
         background-color: var(--primary-green);
         border: none;
-        color: white;
+        color: rgb(255, 255, 255);
         padding: 12px;
         font-weight: 600;
         border-radius: 8px;
         width: 100%;
         transition: all 0.3s ease;
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        cursor: pointer;
     }
     
     .login-btn:hover {
